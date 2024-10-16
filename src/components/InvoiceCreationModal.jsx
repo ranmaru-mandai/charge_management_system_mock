@@ -23,6 +23,9 @@ const InvoiceCreationModal = ({ visible, onCancel, onSave }) => {
           form.resetFields();
           setIsEdited(false);
         },
+        onCancel: () => {
+          // モーダルを閉じないでそのまま
+        },
       });
     } else {
       onCancel();
