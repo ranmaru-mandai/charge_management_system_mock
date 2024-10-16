@@ -1,23 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, Form, Input, DatePicker, InputNumber, Button } from 'antd';
 
 const InvoiceCreationModal = ({ visible, onCancel, onSave }) => {
   const [form] = Form.useForm();
+  const [isEdited, setIsEdited] = useState(false);
 
   const handleOk = () => {
     form.validateFields().then((values) => {
       onSave(values);
       form.resetFields();
+      setIsEdited(false);
     });
+  };
+
+  const handleCancel = () => {
+    if (isEdited) {
+      Modal.confirm({
+        title: '変更を破棄しますか？',
+        content: '編集内容が保存されていません。本当に閉じますか？',
+        onOk: () => {
+          onCancel();
+          form.resetFields();
+          setIsEdited(false);
+        },
+      });
+    } else {
+      onCancel();
+    }
   };
 
   return (
     <Modal
       title="請求書作成"
       visible={visible}
-      onCancel={onCancel}
+      onCancel={handleCancel}
       footer={[
-        <Button key="cancel" onClick={onCancel}>
+        <Button key="cancel" onClick={handleCancel}>
           キャンセル
         </Button>,
         <Button key="submit" type="primary" onClick={handleOk}>
@@ -25,7 +43,11 @@ const InvoiceCreationModal = ({ visible, onCancel, onSave }) => {
         </Button>,
       ]}
     >
-      <Form form={form} layout="vertical">
+      <Form 
+        form={form} 
+        layout="vertical"
+        onValuesChange={() => setIsEdited(true)}
+      >
         <Form.Item
           name="clientName"
           label="顧客名"
